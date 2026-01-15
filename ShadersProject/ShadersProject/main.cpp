@@ -2,6 +2,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "shader.h"
+
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
@@ -34,20 +36,6 @@ void loadOpenGLPointers() {
     }
 }
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec4 myColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = myColor;\n"
-    "}\n\0";
-
 void run(GLFWwindow* window);
 
 int main(int argc, const char * argv[]) {
@@ -65,46 +53,17 @@ int main(int argc, const char * argv[]) {
 }
 
 void run(GLFWwindow* window) {
-    // -- Vertex shader --
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "Vertex shader compile error: " << infoLog;
-    }
-
-    // -- Fragment shader --
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "Fragment shader compile error: " << infoLog;
-    }
-
-    // -- Shader program --
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "Shader program link error\n" << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    // By default xcode use DerivedData folder as the working directory.
+    // So in order to read the files you need to edit the Working direcotry from
+    // "Edit scheme" -> "Run" -> "Options" -> "Working directory"
+    Shader shader = Shader("vertexShader.vs", "fragmentShader.fs");
 
     // -- Configure shape --
     float vertexs[] = {
-        0.0f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
+        // Vertex           // Colors
+         0.0f,  0.5f, 0.0f, 1.0f,0.0f,0.0f,1.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f,1.0f,0.0f,1.0f,
+         0.5f, -0.5f, 0.0f, 0.0f,0.0f,1.0f,1.0f,
     };
 
     unsigned int VAO, VBO;
@@ -118,9 +77,13 @@ void run(GLFWwindow* window) {
 
     // Two options declar the location of the attribute in the shader using `layout(location = 0) in...`
     // or use glGetAttribLocation to find the location of the attribute (avoiding the layout(locaition = 0))
-    int attributeLocation = glGetAttribLocation(shaderProgram, "aPos");
-    glVertexAttribPointer(attributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    int attributeLocation = glGetAttribLocation(shader.ID, "aPos");
+    glVertexAttribPointer(attributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)0);
     glEnableVertexAttribArray(attributeLocation);
+
+    int colorAttribute = glGetAttribLocation(shader.ID, "myColor");
+    glVertexAttribPointer(colorAttribute, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(colorAttribute);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -130,15 +93,7 @@ void run(GLFWwindow* window) {
         glClearColor(0.1f,0.2f,0.0f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-
-        glUseProgram(shaderProgram);
-
-        float time = glfwGetTime();
-        float rColor = abs(sin(time/2));
-        float gColor = abs(sin(time/2 +1.5f));
-        std::cout << "R: " << rColor << ", G: " << gColor << " - Time: " << time << std::endl;
-        int colorAttribute = glGetUniformLocation(shaderProgram, "myColor");
-        glUniform4f(colorAttribute, rColor, gColor, 0.0f, 1.0f);
+        shader.use();
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -149,6 +104,6 @@ void run(GLFWwindow* window) {
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteProgram(shader.ID);
     glfwTerminate();
 }
