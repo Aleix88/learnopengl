@@ -1,4 +1,8 @@
+*.o
+.vscode
+main.dSYM
 glfw-build-xcode
 libs
 glfw-3.4
 includes
+*.xcodeproj
