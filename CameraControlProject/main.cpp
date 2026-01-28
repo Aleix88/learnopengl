@@ -11,6 +11,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "Helpers/shader.hpp"
+#include "Helpers/camera.hpp"
 
 float W_WIDTH = 500.0f;
 float W_HEIGHT = 500.0f;
@@ -210,6 +211,8 @@ int main() {
     projectionMatrix = glm::perspective(glm::radians(80.0f), W_WIDTH/W_HEIGHT, 0.1f, 100.0f);
     glUniformMatrix4fv(glGetUniformLocation(shader.ID, "vProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
+    
+
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     glm::vec3 cameraForward = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -233,7 +236,7 @@ int main() {
         if(glfwGetKey(window, GLFW_KEY_D))
             cameraPos += cameraSpeed * glm::normalize(glm::cross(cameraDirection, cameraUp));
 
-        viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraDirection, cameraUp);
+        viewMatrix = glm::lookAt(camera.position, camera.forward, camera.up);
         glUniformMatrix4fv(glGetUniformLocation(shader.ID, "vViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
         glBindVertexArray(VAO);
