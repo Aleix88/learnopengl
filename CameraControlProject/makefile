@@ -1,19 +1,22 @@
-.DEFAULT_GOAL := r
+CC = clang
+CXX = clang++
 
-d: main
-	lldb main
-	clean
+INCLUDES = -I $(HOME)/include
+LIBRARIES = -L $(HOME)/libs
 
-r: main
-	./main
-	clean
-	
-main:
-	@rm -f main
-	clang++ -g -O0 --std=gnu++23 main.cpp -I ~/include -L ~/libs -l glfw3 -l glad -o main
+CXXFLAGS = -g -O0 --std=gnu++23 $(INCLUDES) $(LIBRARIES)
+
+LDFLAGS = -lglfw3 -lglad
+
+TARGET = main
+
+all: $(TARGET)
+
+$(TARGET):
+	$(CXX) $(CXXFLAGS) main.cpp $(LDFLAGS) -o $@
 
 clean:
 	@echo "Cleaning..."
+	@rm -f *.o $(TARGET)
 
-cleanall: clean
-	@rm -rf main main.dSYM
+.PHONY: clean all
