@@ -58,45 +58,26 @@ unsigned int loadTexture(std::string source, int index) {
     return id;
 }
 
-float lastXPos = -1.0f;
-float lastYPos = -1.0f;
-glm::vec3 cameraDirection = glm::vec3(0, 0, -1);
-float pitch = 0.0f;
-float yaw = 0.0f;
+Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 void printVector(std::string name, glm::vec3 v) {
     std::println("{0}: ({1}, {2}, {3}) ", name, v.x, v.y, v.z);
 }
 
 void glfwCursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-    float deltaX = xpos - lastXPos;
-    float deltaY = ypos - lastYPos;
-    const float rotationIncrement = 0.005f;
-    if (lastXPos != -1.0f && lastYPos != -1.0f) {
-        // pitch += std::min(std::max(-rotationIncrement * deltaY, glm::pi<float>()/4), glm::pi<float>()*3/4);
-        pitch += -rotationIncrement * deltaY;
-        float pitchLimit = 80.0f;
-        if (glm::degrees(pitch) > pitchLimit) {
-            pitch = glm::radians(pitchLimit);
-        } else if (glm::degrees(pitch) < -pitchLimit) {
-            pitch = glm::radians(-pitchLimit);
-        }
-        yaw += rotationIncrement * deltaX;
-    }
+    camera.processMouseInput(xpos, ypos);
+}
 
-    cameraDirection = glm::vec3
-    (
-        sin(yaw) * cos(pitch),
-        sin(pitch),
-        -cos(yaw) * cos(pitch)
-    );
-    // printVector("Direction:", cameraDirection);
-    cameraDirection = glm::normalize(cameraDirection);
-    std::println("Pitch: {0}, Yaw: {1}", glm::degrees(pitch), glm::degrees(yaw));
-    printVector("Norm:", cameraDirection);
-
-    lastXPos = xpos;
-    lastYPos = ypos;
+void processCameraKeys(GLFWwindow* window, float deltaTime) {
+    camera.setTurbo(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT));
+    if (glfwGetKey(window, GLFW_KEY_W))
+        camera.processKeyboardInput(::FORWARD, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_S))
+        camera.processKeyboardInput(::BACKWARD, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_A))
+        camera.processKeyboardInput(::LEFT, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_D))
+        camera.processKeyboardInput(::RIGHT, deltaTime);
 }
 
 int main() {
@@ -211,12 +192,6 @@ int main() {
     projectionMatrix = glm::perspective(glm::radians(80.0f), W_WIDTH/W_HEIGHT, 0.1f, 100.0f);
     glUniformMatrix4fv(glGetUniformLocation(shader.ID, "vProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-    
-
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    glm::vec3 cameraForward = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
     float lastFrameTime = 0.0f;
     while(!glfwWindowShouldClose(window)) {
         glClearColor(0.5f, 0.5f, 0.0f, 1.0f);
@@ -225,19 +200,9 @@ int main() {
         float deltaTime = glfwGetTime() - lastFrameTime;
         lastFrameTime = glfwGetTime();
 
-        glm::mat4x4 viewMatrix = glm::mat4x4(1);
-        float cameraSpeed = 3.0f * deltaTime;
-        if (glfwGetKey(window, GLFW_KEY_W))
-            cameraPos += cameraSpeed * cameraDirection;
-        if(glfwGetKey(window, GLFW_KEY_S))
-            cameraPos -= cameraSpeed * cameraDirection;
-        if(glfwGetKey(window, GLFW_KEY_A))
-            cameraPos -= cameraSpeed * glm::normalize(glm::cross(cameraDirection, cameraUp));
-        if(glfwGetKey(window, GLFW_KEY_D))
-            cameraPos += cameraSpeed * glm::normalize(glm::cross(cameraDirection, cameraUp));
-
-        viewMatrix = glm::lookAt(camera.position, camera.forward, camera.up);
-        glUniformMatrix4fv(glGetUniformLocation(shader.ID, "vViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+        processCameraKeys(window, deltaTime);
+        
+        glUniformMatrix4fv(glGetUniformLocation(shader.ID, "vViewMatrix"), 1, GL_FALSE, glm::value_ptr(camera.viewMatrix()));
 
         glBindVertexArray(VAO);
 
@@ -256,3 +221,9 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+
+
+
+// Recto Direciton: (-0.06476731,-0.14693274,-0.9870239)
+// Atras Direciton: (-0.029339513,-0.08000176,0.9963629)
+// FLIP Direciton: (0.021123111,-0.13729565,0.9903049)
