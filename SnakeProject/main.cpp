@@ -93,10 +93,9 @@ int main() {
     unsigned int cubesVAO;
     glGenVertexArrays(1, &cubesVAO);
     glBindVertexArray(cubesVAO);
-    // unsigned int cubesVBO = createCubesVBO();
-    Cube cube = Cube(0.0f, 0.0f, 1.0f);
-    cube.draw();
-    cube.bind(0);
+    std::vector<Cube> tailCubes = {Cube(0.0f, 0.0f, 1.0f)};
+    tailCubes[0].draw();
+    tailCubes[0].bind(0);
 
     // Position attribute
     glVertexAttribBinding(0, 0);
@@ -125,10 +124,19 @@ int main() {
     glEnable( GL_BLEND );
 
     glm::vec3 snakeDirection = glm::vec3(1.0f,0.0f,0.0f);
-    float snakeSpeed = 0.8f;
-    glm::vec3 snakePosition = glm::vec3(planeLeft, 0.01f, planeNear);
+    float snakeSpeed = 0.09f;
+    std::vector<glm::vec3> snakePositions = {glm::vec3(planeLeft, 0.01f, planeNear)};
+    
+    struct DirectionChange {
+        glm::vec3 direction;
+        glm::vec3 position;
+    };
 
-    std::vector<Cube> tailCubes;
+    std::vector<DirectionChange> directionChanges;
+    DirectionChange initialDirection;
+    initialDirection.direction = snakeDirection;
+    initialDirection.position = snakePositions[0];
+    directionChanges.push_back(initialDirection);
 
     float lastTime = 0.0f;    
     while(!glfwWindowShouldClose(window)) {
@@ -155,53 +163,59 @@ int main() {
             snakeDirection = glm::vec3(-1,0,0);
         if (glfwGetKey(window, GLFW_KEY_D))
             snakeDirection = glm::vec3(1,0,0);
-
-        glm::vec3 translation = snakeDirection * snakeSpeed * deltaTime;
-        snakePosition += translation;
-        // std::println("{0} {1} {2}", snakePosition.x, snakePosition.y, snakePosition.z);
-        if (snakePosition.x < planeLeft) {
-            snakePosition.x = planeRight - cubeSize;
-        } else if (snakePosition.x + cubeSize > planeRight) {
-            snakePosition.x = planeLeft;
-        } else if (snakePosition.z > planeNear) {
-            snakePosition.z = planeFar + cubeSize;
-        } else if (snakePosition.z - cubeSize < planeFar) {
-            snakePosition.z = planeNear;
-        }
-
-        // Go back to identity matrix but with a custom position
-        snakeModelMatrix[0][0] = 1;
-        snakeModelMatrix[3][0] = snakePosition.x;
-        snakeModelMatrix[2][2] = 1;
-        snakeModelMatrix[3][2] = snakePosition.z;
-
-        snakeModelMatrix = glm::translate(snakeModelMatrix, translation);
-        shader.setMat4("modelMatrix", snakeModelMatrix);
-
-        cube.bind(0);
-        glDrawElements(GL_TRIANGLES, 36,  GL_UNSIGNED_INT, 0);
+            DirectionChange dc;
+            dc.direction = snakeDirection;
+            dc.position = snakePositions[0];
+            directionChanges.push_back(dc);
 
         if (spacePressed) {
-            tailCubes.push_back(Cube(0.0f, 1.0f, 0.0f));
+            int prevCube = snakePositions.size() - 1;
+            tailCubes.push_back(Cube(0.0f, sin(glfwGetTime()), 0.0f));
             tailCubes[tailCubes.size() - 1].draw();
+            glm::vec3 cubePosition = glm::vec3(
+                snakePositions[prevCube].x - (snakeDirection.x * cubeSize),
+                snakePositions[prevCube].y,
+                snakePositions[prevCube].z - (snakeDirection.z * cubeSize)
+            );
+            snakePositions.push_back(cubePosition);
+            std::println("{0}, {1}", snakePositions[prevCube].x, cubePosition.x);
             spacePressed = false;
         }
 
         for (int i = 0; i < tailCubes.size(); i++) {
-            tailCubes[i].bind(0);
+            if (snakePositions[i].x < planeLeft) {
+                snakePositions[i].x = planeRight - cubeSize;
+            } else if (snakePositions[i].x + cubeSize > planeRight) {
+                snakePositions[i].x = planeLeft;
+            } else if (snakePositions[i].z > planeNear) {
+                snakePositions[i].z = planeFar + cubeSize;
+            } else if (snakePositions[i].z - cubeSize < planeFar) {
+                snakePositions[i].z = planeNear;
+            }
+
             snakeModelMatrix = glm::mat4(1);
             snakeModelMatrix[0][0] = 1;
-            snakeModelMatrix[3][0] = snakePosition.x - (snakeDirection.x * cubeSize * (i+1));
+            snakeModelMatrix[3][0] = snakePositions[i].x;
             snakeModelMatrix[2][2] = 1;
-            snakeModelMatrix[3][2] = snakePosition.z - (snakeDirection.z * cubeSize * (i+1));
-            snakeModelMatrix = glm::translate(snakeModelMatrix, translation);
+            snakeModelMatrix[3][2] = snakePositions[i].z;
+            
+            tailCubes[i].bind(0);
             shader.setMat4("modelMatrix", snakeModelMatrix);
+
             glDrawElements(GL_TRIANGLES, 36,  GL_UNSIGNED_INT, 0);
+
+            glm::vec3 translation = snakeDirection * snakeSpeed * deltaTime;
+            snakePositions[i] = snakePositions[i] + translation;
         }
 
         // SWAP AND POLL
         glfwSwapBuffers(window);
         glfwPollEvents();
+    }
+
+    for (int i = 0; i < tailCubes.size(); i++) {
+        glDeleteBuffers(1, &tailCubes[i].VBO);
+        glDeleteBuffers(1, &tailCubes[i].EBO);
     }
 
     return EXIT_SUCCESS;

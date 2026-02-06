@@ -1,5 +1,5 @@
 #include <iostream>
-#include <glad/glad.h>
+#include <print>
 #include "constants.h"
 #include "cube.h"
 
@@ -12,8 +12,9 @@ Cube::Cube(float rColor, float gColor, float bColor) {
 };
 
 Cube::~Cube() {
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    // Veure perque es crida el desctructor... perque realment el objecte esta guardat al vector...
+    // glDeleteBuffers(1, &VBO);
+    // glDeleteBuffers(1, &EBO);
 }
 
 void Cube::draw() {
