@@ -13,6 +13,8 @@
 #include "Helpers/camera.hpp"
 #include "Helpers/texture.hpp"
 #include "Helpers/window.hpp"
+#include "constants.h"
+#include "cube.h"
 
 float W_WIDTH = 500.0f;
 float W_HEIGHT = 500.0f;
@@ -33,20 +35,13 @@ void glfwCursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     // camera.processMouseInput(xpos, ypos);
 }
 
-float cubeSize = 0.1f;
-float size = cubeSize*20;
-float right = size;
-float left = 0.0f;
-float near = 0.0f;
-float far = - size;
-
 unsigned int createGroundVBO() {
     float vertices[] = {
         // Position           // Color
-        left, 0.0f, near,     1.0f, 0.0f, 0.0f, 1.0f, // TOP-LEFT
-        right, 0.0f, near,    1.0f, 0.0f, 0.0f, 1.0f, // TOP-RIGHT
-        left, 0.0f, far,      1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-LEFT
-        right, 0.0f, far,     1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-RIGHT
+        planeLeft, 0.0f, planeNear,     1.0f, 0.0f, 0.0f, 1.0f, // TOP-LEFT
+        planeRight, 0.0f, planeNear,    1.0f, 0.0f, 0.0f, 1.0f, // TOP-RIGHT
+        planeLeft, 0.0f, planeFar,      1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-LEFT
+        planeRight, 0.0f, planeFar,     1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-RIGHT
     };
 
     unsigned int elements[] = {
@@ -73,15 +68,15 @@ unsigned int createCubesVBO() {
     float y = 0.01f;
     std::vector<float> vertices = {
         // Position                              // Color
-        left, y, near - cubeSize,                0.0f, 0.0f, 1.0f, alpha,
-        left, y, near,                           0.0f, 0.0f, 1.0f, alpha,
-        left + cubeSize, y, near,                0.0f, 0.0f, 1.0f, alpha,
-        left + cubeSize, y, near - cubeSize,     0.0f, 0.0f, 1.0f, alpha,
+        planeLeft, y, planeNear - cubeSize,                0.0f, 0.0f, 1.0f, alpha,
+        planeLeft, y, planeNear,                           0.0f, 0.0f, 1.0f, alpha,
+        planeLeft + cubeSize, y, planeNear,                0.0f, 0.0f, 1.0f, alpha,
+        planeLeft + cubeSize, y, planeNear - cubeSize,     0.0f, 0.0f, 1.0f, alpha,
 
-        left, y + cubeSize, near - cubeSize,                0.0f, 0.0f, 1.0f, alpha,
-        left, y + cubeSize, near,                           0.0f, 0.0f, 1.0f, alpha,
-        left + cubeSize, y + cubeSize, near,                0.0f, 0.0f, 1.0f, alpha,
-        left + cubeSize, y + cubeSize, near - cubeSize,     0.0f, 0.0f, 1.0f, alpha,
+        planeLeft, y + cubeSize, planeNear - cubeSize,                0.0f, 0.0f, 1.0f, alpha,
+        planeLeft, y + cubeSize, planeNear,                           0.0f, 0.0f, 1.0f, alpha,
+        planeLeft + cubeSize, y + cubeSize, planeNear,                0.0f, 0.0f, 1.0f, alpha,
+        planeLeft + cubeSize, y + cubeSize, planeNear - cubeSize,     0.0f, 0.0f, 1.0f, alpha,
     };
 
     std::vector elements = {0,1,2, 2,3,0, 4,5,6, 6,7,4};
@@ -134,7 +129,11 @@ int main() {
     unsigned int cubesVAO;
     glGenVertexArrays(1, &cubesVAO);
     glBindVertexArray(cubesVAO);
-    unsigned int cubesVBO = createCubesVBO();
+    // unsigned int cubesVBO = createCubesVBO();
+    Cube cube = Cube();
+    cube.draw();
+    cube.bind(0);
+
     // Position attribute
     glVertexAttribBinding(0, 0);
     glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
@@ -163,7 +162,7 @@ int main() {
 
     glm::vec3 snakeDirection = glm::vec3(1.0f,0.0f,0.0f);
     float snakeSpeed = 0.8f;
-    glm::vec3 snakePosition = glm::vec3(left, 0.01f, near);
+    glm::vec3 snakePosition = glm::vec3(planeLeft, 0.01f, planeNear);
 
     float lastTime = 0.0f;    
     while(!glfwWindowShouldClose(window)) {
@@ -191,16 +190,17 @@ int main() {
         if (glfwGetKey(window, GLFW_KEY_D))
             snakeDirection = glm::vec3(1,0,0);
 
-        snakePosition += snakeDirection * snakeSpeed * deltaTime;
+        glm::vec3 translation = snakeDirection * snakeSpeed * deltaTime;
+        snakePosition += translation;
         // std::println("{0} {1} {2}", snakePosition.x, snakePosition.y, snakePosition.z);
-        if (snakePosition.x < left) {
-            snakePosition.x = right - cubeSize;
-        } else if (snakePosition.x + cubeSize > right) {
-            snakePosition.x = left;
-        } else if (snakePosition.z > near) {
-            snakePosition.z = far + cubeSize;
-        } else if (snakePosition.z - cubeSize < far) {
-            snakePosition.z = near;
+        if (snakePosition.x < planeLeft) {
+            snakePosition.x = planeRight - cubeSize;
+        } else if (snakePosition.x + cubeSize > planeRight) {
+            snakePosition.x = planeLeft;
+        } else if (snakePosition.z > planeNear) {
+            snakePosition.z = planeFar + cubeSize;
+        } else if (snakePosition.z - cubeSize < planeFar) {
+            snakePosition.z = planeNear;
         }
 
         // Go back to identity matrix but with a custom position
@@ -209,7 +209,7 @@ int main() {
         snakeModelMatrix[2][2] = 1;
         snakeModelMatrix[3][2] = snakePosition.z;
 
-        snakeModelMatrix = glm::translate(snakeModelMatrix, snakeDirection * snakeSpeed * deltaTime);
+        snakeModelMatrix = glm::translate(snakeModelMatrix, translation);
         shader.setMat4("modelMatrix", snakeModelMatrix);
         glDrawElements(GL_TRIANGLES, 36,  GL_UNSIGNED_INT, 0);
 

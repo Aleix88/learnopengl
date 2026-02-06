@@ -8,7 +8,7 @@ CXXFLAGS = -g -O0 --std=gnu++23 $(INCLUDES) $(LIBRARIES)
 
 LDFLAGS = -lglfw3 -lglad
 
-OBJECTS = stb_image.o
+OBJECTS = stb_image.o cube.o
 
 TARGET = main
 
