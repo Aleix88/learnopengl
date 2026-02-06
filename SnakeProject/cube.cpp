@@ -3,7 +3,10 @@
 #include "constants.h"
 #include "cube.h"
 
-Cube::Cube() {
+Cube::Cube(float rColor, float gColor, float bColor) {
+    r = rColor;
+    g = gColor;
+    b = bColor;
     vertices = createCubeVertices();
     elements = createCubeElements();
 };
@@ -16,7 +19,6 @@ Cube::~Cube() {
 void Cube::draw() {
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
@@ -33,15 +35,15 @@ std::vector<float> Cube::createCubeVertices() {
     float y = 0.01f;
     std::vector<float> vertices = {
         // Position                                                     // Color
-        planeLeft, y, planeNear - cubeSize,                             0.0f, 0.0f, 1.0f, alpha,
-        planeLeft, y, planeNear,                                        0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y, planeNear,                             0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y, planeNear - cubeSize,                  0.0f, 0.0f, 1.0f, alpha,
+        planeLeft, y, planeNear - cubeSize,                             r, g, b, alpha,
+        planeLeft, y, planeNear,                                        r, g, b, alpha,
+        planeLeft + cubeSize, y, planeNear,                             r, g, b, alpha,
+        planeLeft + cubeSize, y, planeNear - cubeSize,                  r, g, b, alpha,
 
-        planeLeft, y + cubeSize, planeNear - cubeSize,                  0.0f, 0.0f, 1.0f, alpha,
-        planeLeft, y + cubeSize, planeNear,                             0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y + cubeSize, planeNear,                  0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y + cubeSize, planeNear - cubeSize,       0.0f, 0.0f, 1.0f, alpha,
+        planeLeft, y + cubeSize, planeNear - cubeSize,                  r, g, b, alpha,
+        planeLeft, y + cubeSize, planeNear,                             r, g, b, alpha,
+        planeLeft + cubeSize, y + cubeSize, planeNear,                  r, g, b, alpha,
+        planeLeft + cubeSize, y + cubeSize, planeNear - cubeSize,       r, g, b, alpha,
     };
     return vertices;
 }

@@ -8,7 +8,7 @@ public:
     std::vector<float> vertices;
     std::vector<unsigned int> elements;
 
-    Cube();
+    Cube(float rColor, float gColor, float bColor);
     ~Cube();
 
     void draw();
@@ -17,6 +17,7 @@ public:
 private:
     unsigned int VBO;
     unsigned int EBO;
+    float r,g,b;
     std::vector<float> createCubeVertices();
     std::vector<unsigned int> createCubeElements();
 };

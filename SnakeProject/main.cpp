@@ -35,6 +35,12 @@ void glfwCursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     // camera.processMouseInput(xpos, ypos);
 }
 
+bool spacePressed = false;
+void glfwKeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+        spacePressed = true;
+}
+
 unsigned int createGroundVBO() {
     float vertices[] = {
         // Position           // Color
@@ -63,53 +69,11 @@ unsigned int createGroundVBO() {
     return vbo;
 }
 
-unsigned int createCubesVBO() {
-    float alpha = 0.4f;
-    float y = 0.01f;
-    std::vector<float> vertices = {
-        // Position                              // Color
-        planeLeft, y, planeNear - cubeSize,                0.0f, 0.0f, 1.0f, alpha,
-        planeLeft, y, planeNear,                           0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y, planeNear,                0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y, planeNear - cubeSize,     0.0f, 0.0f, 1.0f, alpha,
-
-        planeLeft, y + cubeSize, planeNear - cubeSize,                0.0f, 0.0f, 1.0f, alpha,
-        planeLeft, y + cubeSize, planeNear,                           0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y + cubeSize, planeNear,                0.0f, 0.0f, 1.0f, alpha,
-        planeLeft + cubeSize, y + cubeSize, planeNear - cubeSize,     0.0f, 0.0f, 1.0f, alpha,
-    };
-
-    std::vector elements = {0,1,2, 2,3,0, 4,5,6, 6,7,4};
-    for (int i = 0; i < 4; i++) {
-        int next = (i + 1) % 4;
-        // Primer triangulo de la cara
-        elements.push_back(i);
-        elements.push_back(i+4);
-        elements.push_back(next);
-        // Segundo triangulo de la cara
-        elements.push_back(next);
-        elements.push_back(i+4);
-        elements.push_back(next+4);
-    }
-
-    unsigned int vbo, ebo;
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-    glBindVertexBuffer(0, vbo, 0, sizeof(float) * 7);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * elements.size(), &elements[0], GL_STATIC_DRAW);
-
-    return vbo;
-}
-
 int main() {
     GLFWwindow* window = configureWindow("Amplitude", W_WIDTH, W_HEIGHT);
     glfwSetFramebufferSizeCallback(window, glfwFramebufferSizeCallback);
     glfwSetCursorPosCallback(window, glfwCursorPosCallback);
+    glfwSetKeyCallback(window, glfwKeyCallBack);
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     loadOpenGLPointers();
 
@@ -130,7 +94,7 @@ int main() {
     glGenVertexArrays(1, &cubesVAO);
     glBindVertexArray(cubesVAO);
     // unsigned int cubesVBO = createCubesVBO();
-    Cube cube = Cube();
+    Cube cube = Cube(0.0f, 0.0f, 1.0f);
     cube.draw();
     cube.bind(0);
 
@@ -163,6 +127,8 @@ int main() {
     glm::vec3 snakeDirection = glm::vec3(1.0f,0.0f,0.0f);
     float snakeSpeed = 0.8f;
     glm::vec3 snakePosition = glm::vec3(planeLeft, 0.01f, planeNear);
+
+    std::vector<Cube> tailCubes;
 
     float lastTime = 0.0f;    
     while(!glfwWindowShouldClose(window)) {
@@ -211,8 +177,27 @@ int main() {
 
         snakeModelMatrix = glm::translate(snakeModelMatrix, translation);
         shader.setMat4("modelMatrix", snakeModelMatrix);
+
+        cube.bind(0);
         glDrawElements(GL_TRIANGLES, 36,  GL_UNSIGNED_INT, 0);
 
+        if (spacePressed) {
+            tailCubes.push_back(Cube(0.0f, 1.0f, 0.0f));
+            tailCubes[tailCubes.size() - 1].draw();
+            spacePressed = false;
+        }
+
+        for (int i = 0; i < tailCubes.size(); i++) {
+            tailCubes[i].bind(0);
+            snakeModelMatrix = glm::mat4(1);
+            snakeModelMatrix[0][0] = 1;
+            snakeModelMatrix[3][0] = snakePosition.x - (snakeDirection.x * cubeSize * (i+1));
+            snakeModelMatrix[2][2] = 1;
+            snakeModelMatrix[3][2] = snakePosition.z - (snakeDirection.z * cubeSize * (i+1));
+            snakeModelMatrix = glm::translate(snakeModelMatrix, translation);
+            shader.setMat4("modelMatrix", snakeModelMatrix);
+            glDrawElements(GL_TRIANGLES, 36,  GL_UNSIGNED_INT, 0);
+        }
 
         // SWAP AND POLL
         glfwSwapBuffers(window);
