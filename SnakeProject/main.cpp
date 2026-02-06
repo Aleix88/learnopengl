@@ -18,8 +18,8 @@ float W_WIDTH = 500.0f;
 float W_HEIGHT = 500.0f;
 
 Camera camera = Camera(
-    glm::vec3(0.0f, 2.3f, 0.4f), 
-    -42, // PITCH
+    glm::vec3(1.0f, 2.0f, 1.8f), 
+    -32, // PITCH
     0 // YAW
 );
 
@@ -35,10 +35,10 @@ void glfwCursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 float cubeSize = 0.1f;
 float size = cubeSize*20;
-float right = size/2;
-float left = -right;
-float near = -1.0f;
-float far = near - size;
+float right = size;
+float left = 0.0f;
+float near = 0.0f;
+float far = - size;
 
 unsigned int createGroundVBO() {
     float vertices[] = {
@@ -164,6 +164,7 @@ int main() {
     glm::vec3 snakeDirection = glm::vec3(1.0f,0.0f,0.0f);
     float snakeSpeed = 0.8f;
     glm::vec3 snakePosition = glm::vec3(left, 0.01f, near);
+
     float lastTime = 0.0f;    
     while(!glfwWindowShouldClose(window)) {
         float deltaTime = glfwGetTime() - lastTime;
@@ -191,25 +192,22 @@ int main() {
             snakeDirection = glm::vec3(1,0,0);
 
         snakePosition += snakeDirection * snakeSpeed * deltaTime;
-        std::println("{0} {1} {2}", snakePosition.x, snakePosition.y, snakePosition.z);
+        // std::println("{0} {1} {2}", snakePosition.x, snakePosition.y, snakePosition.z);
         if (snakePosition.x < left) {
             snakePosition.x = right - cubeSize;
-            // Go back to identity matrix but with a custom position
-            snakeModelMatrix[0][0] = 1;
-            snakeModelMatrix[3][0] = size-cubeSize;
         } else if (snakePosition.x + cubeSize > right) {
             snakePosition.x = left;
-            snakeModelMatrix[0][0] = 1;
-            snakeModelMatrix[3][0] = 0;
         } else if (snakePosition.z > near) {
             snakePosition.z = far + cubeSize;
-            snakeModelMatrix[2][2] = 1;
-            snakeModelMatrix[3][2] = -size+cubeSize;
         } else if (snakePosition.z - cubeSize < far) {
             snakePosition.z = near;
-            snakeModelMatrix[2][2] = 1;
-            snakeModelMatrix[3][2] = 0;
         }
+
+        // Go back to identity matrix but with a custom position
+        snakeModelMatrix[0][0] = 1;
+        snakeModelMatrix[3][0] = snakePosition.x;
+        snakeModelMatrix[2][2] = 1;
+        snakeModelMatrix[3][2] = snakePosition.z;
 
         snakeModelMatrix = glm::translate(snakeModelMatrix, snakeDirection * snakeSpeed * deltaTime);
         shader.setMat4("modelMatrix", snakeModelMatrix);
