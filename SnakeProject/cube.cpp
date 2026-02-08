@@ -11,10 +11,9 @@ Cube::Cube(float rColor, float gColor, float bColor) {
     elements = createCubeElements();
 };
 
-Cube::~Cube() {
-    // Veure perque es crida el desctructor... perque realment el objecte esta guardat al vector...
-    // glDeleteBuffers(1, &VBO);
-    // glDeleteBuffers(1, &EBO);
+void Cube::destroy() {
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 }
 
 void Cube::draw() {
@@ -32,7 +31,7 @@ void Cube::bind(unsigned int index) {
 }
 
 std::vector<float> Cube::createCubeVertices() {
-    float alpha = 0.4f;
+    float alpha = 1.0f;
     float y = 0.01f;
     std::vector<float> vertices = {
         // Position                                                     // Color

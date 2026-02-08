@@ -8,4 +8,7 @@ const float planeLeft = 0.0f;
 const float planeNear = 0.0f;
 const float planeFar = - planceSize;
 
+const float snakeSpeed = 0.4f;
+
+
 #endif

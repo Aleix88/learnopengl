@@ -12,10 +12,10 @@ public:
     std::vector<unsigned int> elements;
 
     Cube(float rColor, float gColor, float bColor);
-    ~Cube();
 
     void draw();
     void bind(unsigned int index);
+    void destroy();
 
 private:
     float r,g,b;

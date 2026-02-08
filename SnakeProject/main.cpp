@@ -35,10 +35,9 @@ void glfwCursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     // camera.processMouseInput(xpos, ypos);
 }
 
-bool spacePressed = false;
+int keyPressed;
 void glfwKeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-        spacePressed = true;
+    keyPressed = action == GLFW_PRESS ? key : -1;
 }
 
 unsigned int createGroundVBO() {
@@ -74,7 +73,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, glfwFramebufferSizeCallback);
     glfwSetCursorPosCallback(window, glfwCursorPosCallback);
     glfwSetKeyCallback(window, glfwKeyCallBack);
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     loadOpenGLPointers();
 
     unsigned int groundVAO;
@@ -93,10 +92,7 @@ int main() {
     unsigned int cubesVAO;
     glGenVertexArrays(1, &cubesVAO);
     glBindVertexArray(cubesVAO);
-    std::vector<Cube> tailCubes = {Cube(0.0f, 0.0f, 1.0f)};
-    tailCubes[0].draw();
-    tailCubes[0].bind(0);
-
+    
     // Position attribute
     glVertexAttribBinding(0, 0);
     glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
@@ -106,39 +102,24 @@ int main() {
     glVertexAttribFormat(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 3);
     glEnableVertexAttribArray(1);
 
-    glBindVertexArray(0);
-
     Shader shader = Shader("Shaders/vertexShader.glsl", "Shaders/fragmentShader.glsl");
     shader.use();
 
-    glm::mat4 modelMatrix = glm::mat4(1);
-    glm::mat4 snakeModelMatrix = glm::mat4(1);
-    glm::mat4 projectionMatrix = glm::mat4(1);
-
-    projectionMatrix = glm::perspective(glm::radians(45.0f), W_WIDTH/W_HEIGHT, 0.1f, 100.0f);
-    shader.setMat4("modelMatrix", modelMatrix);
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), W_WIDTH/W_HEIGHT, 0.1f, 100.0f);
     shader.setMat4("projectionMatrix", projectionMatrix);
 
     glEnable(GL_DEPTH_TEST);  
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_BLEND );
 
-    glm::vec3 snakeDirection = glm::vec3(1.0f,0.0f,0.0f);
-    float snakeSpeed = 0.09f;
-    std::vector<glm::vec3> snakePositions = {glm::vec3(planeLeft, 0.01f, planeNear)};
-    
-    struct DirectionChange {
-        glm::vec3 direction;
-        glm::vec3 position;
-    };
+    std::vector<glm::vec3> snakeDirections = {glm::vec3(1.0f, 0.0f, 0.0f)};
+    std::vector<glm::vec3> snakePositions = {glm::vec3(0.0f, 0.0f, 0.0f)};
+    std::vector<Cube> cubes = {Cube(0.0f, 1.0f, 0.0f)};
 
-    std::vector<DirectionChange> directionChanges;
-    DirectionChange initialDirection;
-    initialDirection.direction = snakeDirection;
-    initialDirection.position = snakePositions[0];
-    directionChanges.push_back(initialDirection);
+    cubes[0].draw();
 
-    float lastTime = 0.0f;    
+    float lastTime = 0.0f;
+    float lastAddTimestamp = 0.0f;
     while(!glfwWindowShouldClose(window)) {
         float deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
@@ -149,74 +130,71 @@ int main() {
 
         // DRAW GROUND
         glBindVertexArray(groundVAO);
-        shader.setMat4("modelMatrix", modelMatrix);
+        // Hauriem de crear un altre shader per no tenir que setejar a 0 aixo pel terra
+        shader.setVec2("posOffset", glm::vec2(0));
         glDrawElements(GL_TRIANGLES, 6,  GL_UNSIGNED_INT, 0);
 
         // DRAW SNAKE
         glBindVertexArray(cubesVAO);
 
-        if (glfwGetKey(window, GLFW_KEY_W))
-            snakeDirection = glm::vec3(0,0,-1);
-        if (glfwGetKey(window, GLFW_KEY_S))
-            snakeDirection = glm::vec3(0,0,1);
-        if (glfwGetKey(window, GLFW_KEY_A))
-            snakeDirection = glm::vec3(-1,0,0);
-        if (glfwGetKey(window, GLFW_KEY_D))
-            snakeDirection = glm::vec3(1,0,0);
-            DirectionChange dc;
-            dc.direction = snakeDirection;
-            dc.position = snakePositions[0];
-            directionChanges.push_back(dc);
-
-        if (spacePressed) {
-            int prevCube = snakePositions.size() - 1;
-            tailCubes.push_back(Cube(0.0f, sin(glfwGetTime()), 0.0f));
-            tailCubes[tailCubes.size() - 1].draw();
-            glm::vec3 cubePosition = glm::vec3(
-                snakePositions[prevCube].x - (snakeDirection.x * cubeSize),
-                snakePositions[prevCube].y,
-                snakePositions[prevCube].z - (snakeDirection.z * cubeSize)
-            );
-            snakePositions.push_back(cubePosition);
-            std::println("{0}, {1}", snakePositions[prevCube].x, cubePosition.x);
-            spacePressed = false;
+        glm::vec3 nextDirection;
+        if (keyPressed == GLFW_KEY_W) {
+            nextDirection = glm::vec3(0,0,-1);
+        }
+        if (keyPressed == GLFW_KEY_S) {
+            nextDirection = glm::vec3(0,0,1);
+        }
+        if (keyPressed == GLFW_KEY_A) {
+            nextDirection = glm::vec3(-1,0,0);
+        }
+        if (keyPressed == GLFW_KEY_D) {
+            nextDirection = glm::vec3(1,0,0);
         }
 
-        for (int i = 0; i < tailCubes.size(); i++) {
-            if (snakePositions[i].x < planeLeft) {
-                snakePositions[i].x = planeRight - cubeSize;
-            } else if (snakePositions[i].x + cubeSize > planeRight) {
-                snakePositions[i].x = planeLeft;
-            } else if (snakePositions[i].z > planeNear) {
-                snakePositions[i].z = planeFar + cubeSize;
-            } else if (snakePositions[i].z - cubeSize < planeFar) {
-                snakePositions[i].z = planeNear;
+        if (nextDirection != -snakeDirections[0]) {
+            snakeDirections[0] = nextDirection;
+        }
+
+        if (keyPressed == GLFW_KEY_SPACE) {
+            cubes.push_back(Cube(0,1.0,0));
+            (cubes.end() - 1)->draw();
+            glm::vec3 prevPosition = *(snakePositions.end() - 1);
+            glm::vec3 prevDirection = *(snakeDirections.end() - 1);
+            glm::vec3 newElementPos = prevPosition - cubeSize * prevDirection;
+            snakePositions.push_back(newElementPos);
+            snakeDirections.push_back(prevDirection);
+        }
+        keyPressed = -1;
+
+        if (glfwGetTime() - lastAddTimestamp > 0.1f) {
+            glm::vec3 newHeadPos = snakePositions[0] + snakeDirections[0] * cubeSize;
+            for (int i = snakePositions.size() - 1; i >= 0; i--) {
+                if (i == 0) {
+                    snakePositions[i] = newHeadPos;
+                } else {
+                    snakeDirections[i] = snakeDirections[i-1];
+                    snakePositions[i] = snakePositions[i-1];
+                    if (snakePositions[i] == newHeadPos) {
+                        std::println("You losed you dum dum...");
+                        glfwSetWindowShouldClose(window, true);
+                        break;
+                    }
+                }
+                lastAddTimestamp = glfwGetTime();
             }
-
-            snakeModelMatrix = glm::mat4(1);
-            snakeModelMatrix[0][0] = 1;
-            snakeModelMatrix[3][0] = snakePositions[i].x;
-            snakeModelMatrix[2][2] = 1;
-            snakeModelMatrix[3][2] = snakePositions[i].z;
-            
-            tailCubes[i].bind(0);
-            shader.setMat4("modelMatrix", snakeModelMatrix);
-
-            glDrawElements(GL_TRIANGLES, 36,  GL_UNSIGNED_INT, 0);
-
-            glm::vec3 translation = snakeDirection * snakeSpeed * deltaTime;
-            snakePositions[i] = snakePositions[i] + translation;
         }
-
+        
+        for (int i = 0; i < snakePositions.size(); i++) {
+            shader.setVec2("posOffset", glm::vec2(snakePositions[i].x, snakePositions[i].z));
+            cubes[i].bind(0);
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        }
         // SWAP AND POLL
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    for (int i = 0; i < tailCubes.size(); i++) {
-        glDeleteBuffers(1, &tailCubes[i].VBO);
-        glDeleteBuffers(1, &tailCubes[i].EBO);
+    for (auto it = cubes.begin(); it < cubes.end(); it++) {
+        it->destroy();
     }
-
     return EXIT_SUCCESS;
 }
