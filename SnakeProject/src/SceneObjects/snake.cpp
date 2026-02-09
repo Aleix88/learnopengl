@@ -29,7 +29,9 @@ Snake::Snake():shader(createShader()) {
 }
 
 Snake::~Snake() {
-    cubes.clear();
+    for (auto it = cubes.begin(); it < cubes.end(); it++) {
+        delete *it;
+    }
     std::println("DESTROY SNAKE INSTANCE");
 }
 

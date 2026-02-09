@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/flariom/Proyectos/learnopengl/SnakeProject",
+            "binaryPath": "/home/flariom/Proyectos/learnopengl/SnakeProject/main",
+            "binaryArgs": []
+        }
+    ]
+}

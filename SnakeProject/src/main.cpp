@@ -10,6 +10,7 @@
 #include "Helpers/window.hpp"
 #include "SceneObjects/snake.h"
 #include "SceneObjects/ground.h"
+#include "SceneObjects/food.h"
 
 float W_WIDTH = 500.0f;
 float W_HEIGHT = 500.0f;
@@ -45,7 +46,7 @@ int main() {
     
     Ground ground = Ground();
     Snake snake = Snake();
-
+    Food food = Food();
     
     glEnable(GL_DEPTH_TEST);  
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -57,10 +58,11 @@ int main() {
         glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        // cameraWASD(window, camera, deltaTime);
+        // cameraWASD(window, camera, 1.0f);
 
         ground.render(projectionMatrix, camera.viewMatrix());
         snake.render(keyPressed, projectionMatrix, camera.viewMatrix());
+        food.render(projectionMatrix, camera.viewMatrix());
 
         keyPressed = -1;
 
