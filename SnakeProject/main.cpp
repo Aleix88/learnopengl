@@ -112,11 +112,27 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_BLEND );
 
-    std::vector<glm::vec3> snakeDirections = {glm::vec3(1.0f, 0.0f, 0.0f)};
-    std::vector<glm::vec3> snakePositions = {glm::vec3(0.0f, 0.0f, 0.0f)};
-    std::vector<Cube> cubes = {Cube(0.0f, 1.0f, 0.0f)};
+    std::vector<glm::ivec3> snakeDirections = {
+        glm::vec3(1, 0, 0),
+        glm::vec3(1, 0, 0),
+        glm::vec3(1, 0, 0),
+    };
+    // Hacer esto con ints porque el float da problemas de precision
+    std::vector<glm::ivec3> snakePositions = {
+        glm::vec3(0, 2, 0),
+        glm::vec3(0, 1, 0),
+        glm::vec3(0, 0, 0),
+    };
+    std::vector<Cube> cubes = {
+        Cube(0.0f, 1.0f, 0.0f),
+        Cube(0.0f, 1.0f, 0.0f),
+        Cube(0.0f, 1.0f, 0.0f),
+    };
+    glm::ivec3 nextDirection = snakeDirections[0];
 
-    cubes[0].draw();
+    for (auto it = cubes.begin(); it < cubes.end(); it++) {
+        it->draw();
+    }
 
     float lastTime = 0.0f;
     float lastAddTimestamp = 0.0f;
@@ -137,12 +153,11 @@ int main() {
         // DRAW SNAKE
         glBindVertexArray(cubesVAO);
 
-        glm::vec3 nextDirection;
         if (keyPressed == GLFW_KEY_W) {
-            nextDirection = glm::vec3(0,0,-1);
+            nextDirection = glm::vec3(0,0,1);
         }
         if (keyPressed == GLFW_KEY_S) {
-            nextDirection = glm::vec3(0,0,1);
+            nextDirection = glm::vec3(0,0,-1);
         }
         if (keyPressed == GLFW_KEY_A) {
             nextDirection = glm::vec3(-1,0,0);
@@ -167,14 +182,25 @@ int main() {
         keyPressed = -1;
 
         if (glfwGetTime() - lastAddTimestamp > 0.1f) {
-            glm::vec3 newHeadPos = snakePositions[0] + snakeDirections[0] * cubeSize;
+            glm::ivec3 newHeadCellPos = snakePositions[0] + snakeDirections[0];
+            std::println("X: {0}, Y: {1}", newHeadCellPos.x, newHeadCellPos.z);
+            if (newHeadCellPos.x > 19) {
+                newHeadCellPos.x = 0;
+            } else if (newHeadCellPos.x < 0) {
+                newHeadCellPos.x = 19;
+            } else if (newHeadCellPos.z > 19) {
+                newHeadCellPos.z = 0;
+            } else if (newHeadCellPos.z < 0) {
+                newHeadCellPos.z = 19;
+            }
+
             for (int i = snakePositions.size() - 1; i >= 0; i--) {
                 if (i == 0) {
-                    snakePositions[i] = newHeadPos;
+                    snakePositions[i] = newHeadCellPos;
                 } else {
                     snakeDirections[i] = snakeDirections[i-1];
                     snakePositions[i] = snakePositions[i-1];
-                    if (snakePositions[i] == newHeadPos) {
+                    if (snakePositions[i] == newHeadCellPos) {
                         std::println("You losed you dum dum...");
                         glfwSetWindowShouldClose(window, true);
                         break;
@@ -185,7 +211,12 @@ int main() {
         }
         
         for (int i = 0; i < snakePositions.size(); i++) {
-            shader.setVec2("posOffset", glm::vec2(snakePositions[i].x, snakePositions[i].z));
+            glm::vec3 offset = glm::vec3(
+                snakePositions[i].x * cubeSize, 
+                0, 
+                -snakePositions[i].z * cubeSize
+            );
+            shader.setVec2("posOffset", glm::vec2(offset.x, offset.z));
             cubes[i].bind(0);
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         }
