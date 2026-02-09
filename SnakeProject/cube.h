@@ -12,10 +12,15 @@ public:
     std::vector<unsigned int> elements;
 
     Cube(float rColor, float gColor, float bColor);
+    ~Cube();
+
+    // Delete default constructors to avoid creating copies of the object.
+    // Creating a copy would cause another call to the buffer generation methods.
+    Cube(const Cube&) = delete;
+    Cube& operator=(const Cube&) = delete;
 
     void draw();
     void bind(unsigned int index);
-    void destroy();
 
 private:
     float r,g,b;

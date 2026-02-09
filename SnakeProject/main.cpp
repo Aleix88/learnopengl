@@ -123,16 +123,12 @@ int main() {
         glm::vec3(0, 1, 0),
         glm::vec3(0, 0, 0),
     };
-    std::vector<Cube> cubes = {
-        Cube(0.0f, 1.0f, 0.0f),
-        Cube(0.0f, 1.0f, 0.0f),
-        Cube(0.0f, 1.0f, 0.0f),
+    std::vector<Cube*> cubes = {
+        new Cube(0.0f, 1.0f, 0.0f),
+        new Cube(0.0f, 1.0f, 0.0f),
+        new Cube(0.0f, 1.0f, 0.0f),
     };
     glm::ivec3 nextDirection = snakeDirections[0];
-
-    for (auto it = cubes.begin(); it < cubes.end(); it++) {
-        it->draw();
-    }
 
     float lastTime = 0.0f;
     float lastAddTimestamp = 0.0f;
@@ -171,8 +167,8 @@ int main() {
         }
 
         if (keyPressed == GLFW_KEY_SPACE) {
-            cubes.push_back(Cube(0,1.0,0));
-            (cubes.end() - 1)->draw();
+            cubes.push_back(new Cube(0,1.0,0));
+            (*(cubes.end() - 1))->draw();
             glm::vec3 prevPosition = *(snakePositions.end() - 1);
             glm::vec3 prevDirection = *(snakeDirections.end() - 1);
             glm::vec3 newElementPos = prevPosition - cubeSize * prevDirection;
@@ -217,15 +213,12 @@ int main() {
                 -snakePositions[i].z * cubeSize
             );
             shader.setVec2("posOffset", glm::vec2(offset.x, offset.z));
-            cubes[i].bind(0);
+            (cubes[i])->bind(0);
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         }
         // SWAP AND POLL
         glfwSwapBuffers(window);
         glfwPollEvents();
-    }
-    for (auto it = cubes.begin(); it < cubes.end(); it++) {
-        it->destroy();
     }
     return EXIT_SUCCESS;
 }

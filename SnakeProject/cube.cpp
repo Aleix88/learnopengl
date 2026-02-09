@@ -9,9 +9,10 @@ Cube::Cube(float rColor, float gColor, float bColor) {
     b = bColor;
     vertices = createCubeVertices();
     elements = createCubeElements();
+    draw();
 };
 
-void Cube::destroy() {
+Cube::~Cube() {
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 }
