@@ -7,7 +7,7 @@
 
 #include "constants.h"
 
-Snake::Snake(Shader* snakeShader) {
+Snake::Snake():shader(createShader()) {
     createVAO();
     directions = {
         glm::vec3(1, 0, 0),
@@ -25,7 +25,6 @@ Snake::Snake(Shader* snakeShader) {
         new Cube(0.0f, 1.0f, 0.0f),
         new Cube(0.0f, 1.0f, 0.0f),
     };
-    shader = snakeShader;
     std::println("CREATING SNAKE INSTANCE {0}", VAO);
 }
 
@@ -47,7 +46,10 @@ void Snake::createVAO() {
     glEnableVertexAttribArray(1);
 }
 
-void Snake::render(int keyPressed) {
+void Snake::render(int keyPressed, glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
+    shader.use();
+    shader.setMat4("projectionMatrix", projectionMatrix);
+    shader.setMat4("viewMatrix", viewMatrix);
     glBindVertexArray(VAO);
     calculateNextDirection(keyPressed);
     move();
@@ -108,10 +110,43 @@ void Snake::move() {
             -positions[i].z * cubeSize
         );
         
-        shader->setVec2("posOffset", glm::vec2(offset.x, offset.z));
+        shader.setVec2("posOffset", glm::vec2(offset.x, offset.z));
         (cubes[i])->bind(0);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     }
+}
+
+Shader Snake::createShader() {
+    std::string vertex = R"(
+    #version 460 core
+
+    layout (location = 0) in vec3 vPos;
+    layout (location = 1) in vec4 vColor;
+
+    out vec4 fColor;
+
+    uniform mat4 viewMatrix;
+    uniform mat4 projectionMatrix;
+    uniform vec2 posOffset;
+
+    void main() {
+        fColor = vColor;
+        gl_Position = projectionMatrix * viewMatrix * vec4(vPos.x + posOffset.x, vPos.y, vPos.z + posOffset.y, 1.0f);
+    }
+    )";
+
+    std::string fragment = R"(
+    #version 460 core
+
+    in vec4 fColor;
+    out vec4 outColor;
+
+    void main() {
+        outColor = fColor;
+    }
+    )";
+
+    return Shader(vertex, fragment, ShaderLoadingType::SOURCE_CODE);
 }
 
 // if (keyPressed == GLFW_KEY_SPACE) {

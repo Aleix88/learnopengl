@@ -15,17 +15,19 @@ public:
     glm::ivec3 nextDirection;
     float lastMoveTimestamp = 0.0;
     unsigned int VAO;
-    Shader* shader;
 
-    Snake(Shader* snakeShader);
+    Snake();
     ~Snake();
 
     void createVAO();
-    void render(int keyPressed);
+    void render(int keyPressed, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 
 private:
+    const Shader shader;
+
     void calculateNextDirection(int keyPressed);
     void move();
+    Shader createShader();
 };
 
 // if (keyPressed == GLFW_KEY_SPACE) {
