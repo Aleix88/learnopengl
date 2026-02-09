@@ -10,13 +10,16 @@ Cube::Cube(float rColor, float gColor, float bColor) {
     vertices = createCubeVertices();
     elements = createCubeElements();
     draw();
+    std::println("CREATING CUBE INSTANCE {0}", VBO);
 };
 
 Cube::~Cube() {
+    std::println("DESTROY CUBE INSTANCE {0}", VBO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 }
 
+// Moure el elements array d'aqui y afegiro al snake que es on es crea el VAO.
 void Cube::draw() {
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
