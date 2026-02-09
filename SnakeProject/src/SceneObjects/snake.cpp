@@ -30,6 +30,7 @@ Snake::Snake(Shader* snakeShader) {
 }
 
 Snake::~Snake() {
+    cubes.clear();
     std::println("DESTROY SNAKE INSTANCE");
 }
 
