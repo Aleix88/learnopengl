@@ -14,13 +14,14 @@ public:
     Cube(float rColor, float gColor, float bColor);
     ~Cube();
 
-    void draw();
     void bind(unsigned int index);
 
 private:
     float r,g,b;
     std::vector<float> createCubeVertices();
     std::vector<unsigned int> createCubeElements();
+
+    void draw();
 };
 
 #endif

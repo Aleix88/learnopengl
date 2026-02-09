@@ -15,29 +15,28 @@ public:
     glm::ivec3 nextDirection;
     float lastMoveTimestamp = 0.0;
     unsigned int VAO;
+    bool collisionDetected = false;
+    bool snakeDied = false;
 
     Snake();
     ~Snake();
 
     void createVAO();
-    void render(int keyPressed, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
+    void render(
+        int keyPressed, 
+        glm::mat4 projectionMatrix, 
+        glm::mat4 viewMatrix,
+        glm::ivec2 foodCell
+    );
 
 private:
     const Shader shader;
 
     void calculateNextDirection(int keyPressed);
     void move();
+    void checkFoodCollision(glm::ivec2);
     Shader createShader();
 };
 
-// if (keyPressed == GLFW_KEY_SPACE) {
-//     cubes.push_back(new Cube(0,1.0,0));
-//     (*(cubes.end() - 1))->draw();
-//     glm::vec3 prevPosition = *(snakePositions.end() - 1);
-//     glm::vec3 prevDirection = *(snakeDirections.end() - 1);
-//     glm::vec3 newElementPos = prevPosition - cubeSize * prevDirection;
-//     snakePositions.push_back(newElementPos);
-//     snakeDirections.push_back(prevDirection);
-// }
 
 #endif

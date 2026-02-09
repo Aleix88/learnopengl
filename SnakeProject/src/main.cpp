@@ -61,8 +61,17 @@ int main() {
         // cameraWASD(window, camera, 1.0f);
 
         ground.render(projectionMatrix, camera.viewMatrix());
-        snake.render(keyPressed, projectionMatrix, camera.viewMatrix());
+        snake.render(keyPressed, projectionMatrix, camera.viewMatrix(), food.foodCell);
         food.render(projectionMatrix, camera.viewMatrix());
+
+        if (snake.collisionDetected) {
+            food.deleteFood();
+            snake.collisionDetected = false;
+        }
+
+        if (snake.snakeDied) {
+            glfwSetWindowShouldClose(window, true);
+        }
 
         keyPressed = -1;
 

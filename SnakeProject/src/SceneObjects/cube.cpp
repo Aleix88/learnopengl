@@ -10,11 +10,9 @@ Cube::Cube(float rColor, float gColor, float bColor) {
     vertices = createCubeVertices();
     elements = createCubeElements();
     draw();
-    std::println("CREATING CUBE INSTANCE {0}", VBO);
 };
 
 Cube::~Cube() {
-    std::println("DESTROY CUBE INSTANCE {0}", VBO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 }

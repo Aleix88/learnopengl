@@ -22,9 +22,8 @@ void Food::render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
         if (cube != NULL) delete cube;
         cube = new Cube(0.0f, 0.0f, 1.0f);
 
-        glm::ivec2 randomCell = glm::vec2((int)(std::rand()%nColumns), -(int)(rand()%nRows));
-        glm::vec2 offset = glm::vec2(randomCell) * cubeSize;
-        std::println("X: {0}, Y: {1}", offset.x, offset.y);
+        foodCell = glm::vec2((int)(std::rand()%nColumns), (int)(rand()%nRows));
+        glm::vec2 offset = glm::vec2(foodCell.x, -foodCell.y) * cubeSize;
         shader.setVec2("offset", offset);
         
         cube->bind(0);
@@ -33,6 +32,14 @@ void Food::render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
     }
     if (cube != NULL) {
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    }
+}
+
+void Food::deleteFood() {
+    if (cube != NULL){
+        delete cube;
+        cube = NULL;
+        foodCell = glm::ivec2(-1);
     }
 }
 

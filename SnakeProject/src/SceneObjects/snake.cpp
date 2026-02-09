@@ -25,14 +25,12 @@ Snake::Snake():shader(createShader()) {
         new Cube(0.0f, 1.0f, 0.0f),
         new Cube(0.0f, 1.0f, 0.0f),
     };
-    std::println("CREATING SNAKE INSTANCE {0}", VAO);
 }
 
 Snake::~Snake() {
     for (auto it = cubes.begin(); it < cubes.end(); it++) {
         delete *it;
     }
-    std::println("DESTROY SNAKE INSTANCE");
 }
 
 void Snake::createVAO() {
@@ -48,13 +46,19 @@ void Snake::createVAO() {
     glEnableVertexAttribArray(1);
 }
 
-void Snake::render(int keyPressed, glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
+void Snake::render(
+    int keyPressed, 
+    glm::mat4 projectionMatrix, 
+    glm::mat4 viewMatrix,
+    glm::ivec2 foodCell
+) {
     shader.use();
     shader.setMat4("projectionMatrix", projectionMatrix);
     shader.setMat4("viewMatrix", viewMatrix);
     glBindVertexArray(VAO);
     calculateNextDirection(keyPressed);
     move();
+    checkFoodCollision(foodCell);
 }
 
 void Snake::calculateNextDirection(int keyPressed) {   
@@ -96,8 +100,7 @@ void Snake::move() {
                 directions[i] = directions[i-1];
                 positions[i] = positions[i-1];
                 if (positions[i] == newHeadCellPos) {
-                    std::println("You losed you dum dum...");
-                    // glfwSetWindowShouldClose(window, true);
+                    snakeDied = true;
                     break;
                 }
             }
@@ -115,6 +118,20 @@ void Snake::move() {
         shader.setVec2("posOffset", glm::vec2(offset.x, offset.z));
         (cubes[i])->bind(0);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    }
+}
+
+void Snake::checkFoodCollision(glm::ivec2 foodCell) {
+    glm::ivec3 headPosition = positions[0];
+
+    if (headPosition.x == foodCell.x && headPosition.z == foodCell.y) {
+        collisionDetected = true;
+        cubes.push_back(new Cube(0,1.0,0));
+        glm::vec3 prevPosition = *(positions.end() - 1);
+        glm::vec3 prevDirection = *(directions.end() - 1);
+        glm::vec3 newElementPos = prevPosition - prevDirection;
+        positions.push_back(newElementPos);
+        directions.push_back(prevDirection);
     }
 }
 
