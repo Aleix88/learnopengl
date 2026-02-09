@@ -73,16 +73,16 @@ void Snake::calculateNextDirection(int keyPressed) {
 }
 
 void Snake::move() {
-    if (glfwGetTime() - lastMoveTimestamp > 0.1f) {
+    if (glfwGetTime() - lastMoveTimestamp > snakeSpeed) {
         glm::ivec3 newHeadCellPos = positions[0] + directions[0];
-        if (newHeadCellPos.x > 19) {
+        if (newHeadCellPos.x > nColumns - 1) {
             newHeadCellPos.x = 0;
         } else if (newHeadCellPos.x < 0) {
-            newHeadCellPos.x = 19;
-        } else if (newHeadCellPos.z > 19) {
+            newHeadCellPos.x = nColumns - 1;
+        } else if (newHeadCellPos.z > nRows - 1) {
             newHeadCellPos.z = 0;
         } else if (newHeadCellPos.z < 0) {
-            newHeadCellPos.z = 19;
+            newHeadCellPos.z = nRows - 1;
         }
 
         for (int i = positions.size() - 1; i >= 0; i--) {

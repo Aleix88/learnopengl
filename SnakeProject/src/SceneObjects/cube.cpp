@@ -38,16 +38,16 @@ std::vector<float> Cube::createCubeVertices() {
     float alpha = 1.0f;
     float y = 0.01f;
     std::vector<float> vertices = {
-        // Position                                                     // Color
-        planeLeft, y, planeNear - cubeSize,                             r, g, b, alpha,
-        planeLeft, y, planeNear,                                        r, g, b, alpha,
-        planeLeft + cubeSize, y, planeNear,                             r, g, b, alpha,
-        planeLeft + cubeSize, y, planeNear - cubeSize,                  r, g, b, alpha,
+        // Position                                  // Color
+        0, y, -cubeSize,                             r, g, b, alpha,
+        0, y, 0,                                     r, g, b, alpha,
+        cubeSize, y, 0,                              r, g, b, alpha,
+        cubeSize, y, -cubeSize,                      r, g, b, alpha,
 
-        planeLeft, y + cubeSize, planeNear - cubeSize,                  r, g, b, alpha,
-        planeLeft, y + cubeSize, planeNear,                             r, g, b, alpha,
-        planeLeft + cubeSize, y + cubeSize, planeNear,                  r, g, b, alpha,
-        planeLeft + cubeSize, y + cubeSize, planeNear - cubeSize,       r, g, b, alpha,
+        0, y + cubeSize, -cubeSize,                  r, g, b, alpha,
+        0, y + cubeSize, 0,                          r, g, b, alpha,
+        0 + cubeSize, y + cubeSize, 0,               r, g, b, alpha,
+        0 + cubeSize, y + cubeSize, -cubeSize,       r, g, b, alpha,
     };
     return vertices;
 }

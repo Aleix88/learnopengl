@@ -1,7 +1,5 @@
 #include "ground.h"
 
-#include "constants.h"
-
 Ground::Ground(Shader* groundShader) {
     shader = groundShader;
     createVAO();

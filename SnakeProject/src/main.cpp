@@ -3,17 +3,11 @@
 #include <vector>
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
-#include<glm/glm.hpp>
-#include<glm/ext.hpp>
-#include<glm/gtc/matrix_transform.hpp>
-#include<glm/gtc/type_ptr.hpp>
 
 #include "libs/stb_image.h"
 #include "Helpers/shader.hpp"
 #include "Helpers/camera.hpp"
-#include "Helpers/texture.hpp"
 #include "Helpers/window.hpp"
-#include "constants.h"
 #include "SceneObjects/snake.h"
 #include "SceneObjects/ground.h"
 
@@ -48,9 +42,6 @@ int main() {
     glfwSetKeyCallback(window, glfwKeyCallBack);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     loadOpenGLPointers();
-
- 
-
     
     Shader shader = Shader("src/Shaders/vertexShader.glsl", "src/Shaders/fragmentShader.glsl");
     shader.use();
@@ -65,21 +56,17 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_BLEND );
 
-
-    float lastTime = 0.0f;
     while(!glfwWindowShouldClose(window)) {
-        float deltaTime = glfwGetTime() - lastTime;
-        lastTime = glfwGetTime();
         glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // cameraWASD(window, camera, deltaTime);
         shader.setMat4("viewMatrix", camera.viewMatrix());
+        // cameraWASD(window, camera, deltaTime);
 
         ground.render();
         snake.render(keyPressed);
 
         keyPressed = -1;
-        
+
         // SWAP AND POLL
         glfwSwapBuffers(window);
         glfwPollEvents();

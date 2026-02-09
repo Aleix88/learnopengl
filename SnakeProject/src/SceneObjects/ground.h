@@ -14,10 +14,10 @@ private:
 
     float vertices[7*4] = {
         // Position           // Color
-        planeLeft, 0.0f, planeNear,     1.0f, 0.0f, 0.0f, 1.0f, // TOP-LEFT
-        planeRight, 0.0f, planeNear,    1.0f, 0.0f, 0.0f, 1.0f, // TOP-RIGHT
-        planeLeft, 0.0f, planeFar,      1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-LEFT
-        planeRight, 0.0f, planeFar,     1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-RIGHT
+        0,                   0.0f, 0,                     1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-LEFT
+        nColumns * cubeSize, 0.0f, 0,                     1.0f, 0.0f, 0.0f, 1.0f, // BOTTOM-RIGHT
+        0,                   0.0f, -nRows * cubeSize,     1.0f, 0.0f, 0.0f, 1.0f, // TOP-LEFT
+        nColumns * cubeSize, 0.0f, -nRows * cubeSize,     1.0f, 0.0f, 0.0f, 1.0f, // TOP-RIGHT
     };
 
     unsigned int elements[3*2] = {
