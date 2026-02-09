@@ -74,8 +74,6 @@ void Snake::calculateNextDirection(int keyPressed) {
 void Snake::move() {
     if (glfwGetTime() - lastMoveTimestamp > 0.1f) {
         glm::ivec3 newHeadCellPos = positions[0] + directions[0];
-        // std::println("X: {0}, Y: {1}", newHeadCellPos.x, newHeadCellPos.z);
-        std::println("{0}", cubeSize);
         if (newHeadCellPos.x > 19) {
             newHeadCellPos.x = 0;
         } else if (newHeadCellPos.x < 0) {

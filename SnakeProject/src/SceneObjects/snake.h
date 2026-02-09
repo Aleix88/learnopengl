@@ -4,7 +4,7 @@
 #include <vector>
 #include <glm/ext.hpp>
 
-#include "cube.h"
+#include "SceneObjects/cube.h"
 #include "Helpers/shader.hpp"
 
 class Snake {

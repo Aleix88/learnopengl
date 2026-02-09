@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <print>
 
-#include "../stb_image.h"
+#include "libs/stb_image.h"
 
 class Texture {
 public:

@@ -8,14 +8,13 @@
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
 
-#include "stb_image.h"
+#include "libs/stb_image.h"
 #include "Helpers/shader.hpp"
 #include "Helpers/camera.hpp"
 #include "Helpers/texture.hpp"
 #include "Helpers/window.hpp"
 #include "constants.h"
-#include "cube.h"
-#include "snake.h"
+#include "SceneObjects/snake.h"
 
 float W_WIDTH = 500.0f;
 float W_HEIGHT = 500.0f;
@@ -91,7 +90,7 @@ int main() {
     glEnableVertexAttribArray(1);    
 
     
-    Shader shader = Shader("Shaders/vertexShader.glsl", "Shaders/fragmentShader.glsl");
+    Shader shader = Shader("src/Shaders/vertexShader.glsl", "src/Shaders/fragmentShader.glsl");
     shader.use();
 
     Snake snake = Snake(&shader);
