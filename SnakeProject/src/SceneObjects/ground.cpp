@@ -1,7 +1,8 @@
 #include "ground.h"
 
-Ground::Ground(Shader* groundShader) {
-    shader = groundShader;
+#include <string>
+
+Ground::Ground():shader(createShader()) {
     createVAO();
 }
 
@@ -10,10 +11,11 @@ Ground::~Ground() {
     glDeleteBuffers(1, &EBO);
 }
 
-void Ground::render() {
+void Ground::render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
+    shader.use();
+    shader.setMat4("projectionMatrix", projectionMatrix);
+    shader.setMat4("viewMatrix", viewMatrix);
     glBindVertexArray(VAO);
-    // Hauriem de crear un altre shader per no tenir que setejar a 0 aixo pel terra
-    shader->setVec2("posOffset", glm::vec2(0));
     glDrawElements(GL_TRIANGLES, 6,  GL_UNSIGNED_INT, 0);
 };
 
@@ -39,4 +41,36 @@ void Ground::createVAO() {
     glVertexAttribBinding(1, 0);
     glVertexAttribFormat(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 3);
     glEnableVertexAttribArray(1);   
+}
+
+Shader Ground::createShader() {
+    std::string vertex = R"(
+    #version 460 core
+
+    layout (location = 0) in vec3 vPos;
+    layout (location = 1) in vec4 vColor;
+
+    out vec4 fColor;
+
+    uniform mat4 viewMatrix;
+    uniform mat4 projectionMatrix;
+
+    void main() {
+        fColor = vColor;
+        gl_Position = projectionMatrix * viewMatrix * vec4(vPos, 1.0f);
+    }
+    )";
+
+    std::string fragment = R"(
+    #version 460 core
+
+    in vec4 fColor;
+    out vec4 outColor;
+
+    void main() {
+        outColor = fColor;
+    }
+    )";
+
+    return Shader(vertex, fragment, ShaderLoadingType::SOURCE_CODE);
 }

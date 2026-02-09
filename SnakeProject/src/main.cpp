@@ -43,26 +43,29 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     loadOpenGLPointers();
     
-    Shader shader = Shader("src/Shaders/vertexShader.glsl", "src/Shaders/fragmentShader.glsl");
-    shader.use();
+    Shader shader = Shader("src/Shaders/vertexShader.glsl", "src/Shaders/fragmentShader.glsl", ShaderLoadingType::FILE_PATH);
 
-    Ground ground = Ground(&shader);
+    Ground ground = Ground();
     Snake snake = Snake(&shader);
 
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), W_WIDTH/W_HEIGHT, 0.1f, 100.0f);
-    shader.setMat4("projectionMatrix", projectionMatrix);
-
+    
     glEnable(GL_DEPTH_TEST);  
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_BLEND );
 
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), W_WIDTH/W_HEIGHT, 0.1f, 100.0f);
+    
     while(!glfwWindowShouldClose(window)) {
         glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.setMat4("viewMatrix", camera.viewMatrix());
+        
         // cameraWASD(window, camera, deltaTime);
 
-        ground.render();
+        ground.render(projectionMatrix, camera.viewMatrix());
+
+        shader.use();
+        shader.setMat4("projectionMatrix", projectionMatrix);
+        shader.setMat4("viewMatrix", camera.viewMatrix());
         snake.render(keyPressed);
 
         keyPressed = -1;

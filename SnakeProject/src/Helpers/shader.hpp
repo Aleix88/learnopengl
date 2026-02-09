@@ -9,6 +9,10 @@
 #include <sstream>
 #include <iostream>
 
+enum ShaderLoadingType {
+    FILE_PATH,
+    SOURCE_CODE
+};
 
 class Shader {
 public:
@@ -18,19 +22,28 @@ public:
     const std::string VERTEX = "VERTEX";
     const std::string PROGRAM = "PROGRAM";
 
-    Shader(const char* vertexPath, const char* fragmentPath) {
-        std::string vShaderFileContent = readFile(vertexPath);
-        std::string fShaderFileContent = readFile(fragmentPath);
-        const char* vShaderCode = vShaderFileContent.c_str();
-        const char* fShaderCode = fShaderFileContent.c_str();
+    Shader(std::string vertexValue, std::string fragmentValue, ShaderLoadingType type) {
+        std::string vShaderCode;
+        std::string fShaderCode;
+        if (type == ::FILE_PATH) {
+            std::string vShaderFileContent = readFile(vertexValue.c_str());
+            std::string fShaderFileContent = readFile(fragmentValue.c_str());
+            vShaderCode = vShaderFileContent;
+            fShaderCode = fShaderFileContent;
+        } else if (type == ::SOURCE_CODE) {
+            vShaderCode = vertexValue;
+            fShaderCode = fragmentValue;
+        }
 
+        const char* vCode = vShaderCode.c_str();
         unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, NULL);
+        glShaderSource(vertex, 1, &vCode, NULL);
         glCompileShader(vertex);
         checkErrors(vertex, VERTEX);
 
+        const char* fCode = fShaderCode.c_str();
         unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fShaderCode, NULL);
+        glShaderSource(fragment, 1, &fCode, NULL);
         glCompileShader(fragment);
         checkErrors(fragment, FRAGMENT);
 
@@ -42,9 +55,15 @@ public:
 
         glDeleteShader(vertex);
         glDeleteShader(fragment);
+
+        std::cout << "INIT SHADER" << std::endl;
     }
 
-    void use() {
+    ~Shader() {
+        std::cout << "DESTRUCT SHADER" << std::endl;
+    }
+
+    void use() const {
         glUseProgram(ID);
     }
 
@@ -64,7 +83,7 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
     }
 
-    void setVec2(const std::string &name, glm::vec2 value) {
+    void setVec2(const std::string &name, glm::vec2 value) const {
         glUniform2f(glGetUniformLocation(ID, name.c_str()), value.x, value.y);
     }
 

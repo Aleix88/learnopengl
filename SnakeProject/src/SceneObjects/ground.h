@@ -1,16 +1,17 @@
-#include "glad/glad.h"
+#include <glm/ext.hpp>
 
+#include "glad/glad.h"
 #include "Helpers/shader.hpp"
 #include "constants.h"
 
 class Ground {
 public:
-    Ground(Shader* groundShader);
+    Ground();
     ~Ground();
 
-    void render();
+    void render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 private:
-    Shader* shader;
+    const Shader shader;
 
     float vertices[7*4] = {
         // Position           // Color
@@ -28,4 +29,5 @@ private:
     unsigned int VAO, VBO, EBO;
 
     void createVAO();
+    Shader createShader();
 };
