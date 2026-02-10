@@ -52,7 +52,7 @@ void Food::createVAO() {
     glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
     glEnableVertexAttribArray(0);
 
-    // // Color attribute
+    // Color attribute
     glVertexAttribBinding(1,0);
     glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3);
     glEnableVertexAttribArray(1);

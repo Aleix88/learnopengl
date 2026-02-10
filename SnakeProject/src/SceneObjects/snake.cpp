@@ -167,13 +167,3 @@ Shader Snake::createShader() {
 
     return Shader(vertex, fragment, ShaderLoadingType::SOURCE_CODE);
 }
-
-// if (keyPressed == GLFW_KEY_SPACE) {
-//     cubes.push_back(new Cube(0,1.0,0));
-//     (*(cubes.end() - 1))->draw();
-//     glm::vec3 prevPosition = *(snakePositions.end() - 1);
-//     glm::vec3 prevDirection = *(snakeDirections.end() - 1);
-//     glm::vec3 newElementPos = prevPosition - cubeSize * prevDirection;
-//     snakePositions.push_back(newElementPos);
-//     snakeDirections.push_back(prevDirection);
-// }

@@ -70,6 +70,7 @@ int main() {
         }
 
         if (snake.snakeDied) {
+            std::println("You losed!");
             glfwSetWindowShouldClose(window, true);
         }
 
