@@ -21,9 +21,9 @@ Snake::Snake():shader(createShader()) {
         glm::vec3(0, 0, 0),
     };
     cubes = {
-        new Cube(0.0f, 1.0f, 0.0f),
-        new Cube(0.0f, 1.0f, 0.0f),
-        new Cube(0.0f, 1.0f, 0.0f),
+        new Cube(color),
+        new Cube(color),
+        new Cube(color),
     };
 }
 
@@ -126,7 +126,7 @@ void Snake::checkFoodCollision(glm::ivec2 foodCell) {
 
     if (headPosition.x == foodCell.x && headPosition.z == foodCell.y) {
         collisionDetected = true;
-        cubes.push_back(new Cube(0,1.0,0));
+        cubes.push_back(new Cube(color));
         glm::vec3 prevPosition = *(positions.end() - 1);
         glm::vec3 prevDirection = *(directions.end() - 1);
         glm::vec3 newElementPos = prevPosition - prevDirection;

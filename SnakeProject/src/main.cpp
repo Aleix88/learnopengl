@@ -55,7 +55,7 @@ int main() {
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), W_WIDTH/W_HEIGHT, 0.1f, 100.0f);
     
     while(!glfwWindowShouldClose(window)) {
-        glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
+        glClearColor(37/255.0f, 67/255.0f, 92/255.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // cameraWASD(window, camera, 1.0f);

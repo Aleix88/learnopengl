@@ -20,7 +20,7 @@ void Food::render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
     if (glfwGetTime() - lastSpawnTime > 4.0f) {
         if (cube != nullptr) delete cube;
-        cube = new Cube(0.0f, 0.0f, 1.0f);
+        cube = new Cube(glm::vec3(255/255.0f, 209.0f/255.0f, 102.0f/255.0f));
 
         foodCell = glm::vec2((int)(std::rand()%nColumns), (int)(rand()%nRows));
         glm::vec2 offset = glm::vec2(foodCell.x, -foodCell.y) * cubeSize;

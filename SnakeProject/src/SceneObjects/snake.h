@@ -31,6 +31,7 @@ private:
     glm::ivec3 nextDirection;
     float lastMoveTimestamp = 0.0;
     unsigned int VAO = 0;
+    glm::vec3 color = glm::vec3(239.0f/255.0f, 71.0f/255.0f, 111.0f/255.0f);
 
     void calculateNextDirection(int keyPressed);
     void move();

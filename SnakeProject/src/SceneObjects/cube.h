@@ -3,12 +3,13 @@
 
 #include <glad/glad.h>
 #include <vector>
+#include <glm/ext.hpp>
 
 class Cube {
 public:
     unsigned int VBO = 0;
     unsigned int EBO = 0;
-    Cube(float rColor, float gColor, float bColor);
+    Cube(glm::vec3 color);
     ~Cube();
 
     void bind(unsigned int index);
@@ -16,7 +17,7 @@ public:
 private:
     std::vector<float> vertices;
     std::vector<unsigned int> elements;
-    float r,g,b = 0.0f;
+    glm::vec3 color;
 
     std::vector<float> createCubeVertices();
     std::vector<unsigned int> createCubeElements();

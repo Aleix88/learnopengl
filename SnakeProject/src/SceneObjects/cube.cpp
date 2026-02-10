@@ -3,10 +3,8 @@
 #include "constants.h"
 #include "cube.h"
 
-Cube::Cube(float rColor, float gColor, float bColor) {
-    r = rColor;
-    g = gColor;
-    b = bColor;
+Cube::Cube(glm::vec3 color) {
+    this->color = color;
     vertices = createCubeVertices();
     elements = createCubeElements();
     draw();
@@ -35,17 +33,18 @@ void Cube::bind(unsigned int index) {
 std::vector<float> Cube::createCubeVertices() {
     float alpha = 1.0f;
     float y = 0.01f;
+    glm::vec3 gradientColor = color - 0.3f;
     std::vector<float> vertices = {
         // Position                                  // Color
-        0, y, -cubeSize,                             r, g, b, alpha,
-        0, y, 0,                                     r, g, b, alpha,
-        cubeSize, y, 0,                              r, g, b, alpha,
-        cubeSize, y, -cubeSize,                      r, g, b, alpha,
+        0, y, -cubeSize,                             gradientColor.r, gradientColor.g, gradientColor.b, alpha,
+        0, y, 0,                                     gradientColor.r, gradientColor.g, gradientColor.b, alpha,
+        cubeSize, y, 0,                              gradientColor.r, gradientColor.g, gradientColor.b, alpha,
+        cubeSize, y, -cubeSize,                      gradientColor.r, gradientColor.g, gradientColor.b, alpha,
 
-        0, y + cubeSize, -cubeSize,                  r, g, b, alpha,
-        0, y + cubeSize, 0,                          r, g, b, alpha,
-        0 + cubeSize, y + cubeSize, 0,               r, g, b, alpha,
-        0 + cubeSize, y + cubeSize, -cubeSize,       r, g, b, alpha,
+        0, y + cubeSize, -cubeSize,                  color.r, color.g, color.b, alpha,
+        0, y + cubeSize, 0,                          color.r, color.g, color.b, alpha,
+        0 + cubeSize, y + cubeSize, 0,               color.r, color.g, color.b, alpha,
+        0 + cubeSize, y + cubeSize, -cubeSize,       color.r, color.g, color.b, alpha,
     };
     return vertices;
 }
