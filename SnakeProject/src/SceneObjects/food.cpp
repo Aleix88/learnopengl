@@ -19,7 +19,7 @@ void Food::render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
     glBindVertexArray(VAO);
 
     if (glfwGetTime() - lastSpawnTime > 4.0f) {
-        if (cube != NULL) delete cube;
+        if (cube != nullptr) delete cube;
         cube = new Cube(0.0f, 0.0f, 1.0f);
 
         foodCell = glm::vec2((int)(std::rand()%nColumns), (int)(rand()%nRows));
@@ -30,15 +30,15 @@ void Food::render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
         lastSpawnTime = glfwGetTime();
     }
-    if (cube != NULL) {
+    if (cube != nullptr) {
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     }
 }
 
 void Food::deleteFood() {
-    if (cube != NULL){
+    if (cube != nullptr){
         delete cube;
-        cube = NULL;
+        cube = nullptr;
         foodCell = glm::ivec2(-1);
     }
 }

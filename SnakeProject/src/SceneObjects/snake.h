@@ -9,12 +9,6 @@
 
 class Snake {
 public:
-    std::vector<glm::ivec3> directions;
-    std::vector<glm::ivec3> positions;
-    std::vector<Cube*> cubes;
-    glm::ivec3 nextDirection;
-    float lastMoveTimestamp = 0.0;
-    unsigned int VAO;
     bool collisionDetected = false;
     bool snakeDied = false;
 
@@ -31,6 +25,12 @@ public:
 
 private:
     const Shader shader;
+    std::vector<glm::ivec3> directions;
+    std::vector<glm::ivec3> positions;
+    std::vector<Cube*> cubes;
+    glm::ivec3 nextDirection;
+    float lastMoveTimestamp = 0.0;
+    unsigned int VAO = 0;
 
     void calculateNextDirection(int keyPressed);
     void move();

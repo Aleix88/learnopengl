@@ -15,11 +15,11 @@ public:
     void deleteFood();
 
 private:
-    unsigned int VAO;
+    unsigned int VAO = 0;
     const Shader shader;
-    float lastSpawnTime;
+    float lastSpawnTime = 0.0f;
 
-    Cube* cube;
+    Cube* cube = nullptr;
 
     void createVAO();
     Shader createShader();

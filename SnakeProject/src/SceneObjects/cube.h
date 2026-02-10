@@ -6,21 +6,20 @@
 
 class Cube {
 public:
-    GLuint VBO;
-    GLuint EBO;
-    std::vector<float> vertices;
-    std::vector<unsigned int> elements;
-
+    unsigned int VBO = 0;
+    unsigned int EBO = 0;
     Cube(float rColor, float gColor, float bColor);
     ~Cube();
 
     void bind(unsigned int index);
 
 private:
-    float r,g,b;
+    std::vector<float> vertices;
+    std::vector<unsigned int> elements;
+    float r,g,b = 0.0f;
+
     std::vector<float> createCubeVertices();
     std::vector<unsigned int> createCubeElements();
-
     void draw();
 };
 

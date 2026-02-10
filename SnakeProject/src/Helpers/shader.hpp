@@ -55,12 +55,6 @@ public:
 
         glDeleteShader(vertex);
         glDeleteShader(fragment);
-
-        std::cout << "INIT SHADER" << std::endl;
-    }
-
-    ~Shader() {
-        std::cout << "DESTRUCT SHADER" << std::endl;
     }
 
     void use() const {
