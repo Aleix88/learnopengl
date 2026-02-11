@@ -16,9 +16,9 @@ private:
     float vertices[7*4] = {
         // Position           // Color
         0,                   0.0f, 0, // BOTTOM-LEFT
-        nColumns * cubeSize, 0.0f, 0, // BOTTOM-RIGHT
-        0,                   0.0f, -nRows * cubeSize, // TOP-LEFT
-        nColumns * cubeSize, 0.0f, -nRows * cubeSize, // TOP-RIGHT
+        Constants::nColumns * Constants::cubeSize, 0.0f, 0, // BOTTOM-RIGHT
+        0,                   0.0f, -Constants::nRows * Constants::cubeSize, // TOP-LEFT
+        Constants::nColumns * Constants::cubeSize, 0.0f, -Constants::nRows * Constants::cubeSize, // TOP-RIGHT
     };
 
     unsigned int elements[3*2] = {

@@ -36,15 +36,15 @@ std::vector<float> Cube::createCubeVertices() {
     glm::vec3 gradientColor = color - 0.3f;
     std::vector<float> vertices = {
         // Position                                  // Color
-        0, y, -cubeSize,                             gradientColor.r, gradientColor.g, gradientColor.b, alpha,
+        0, y, -Constants::cubeSize,                             gradientColor.r, gradientColor.g, gradientColor.b, alpha,
         0, y, 0,                                     gradientColor.r, gradientColor.g, gradientColor.b, alpha,
-        cubeSize, y, 0,                              gradientColor.r, gradientColor.g, gradientColor.b, alpha,
-        cubeSize, y, -cubeSize,                      gradientColor.r, gradientColor.g, gradientColor.b, alpha,
+        Constants::cubeSize, y, 0,                              gradientColor.r, gradientColor.g, gradientColor.b, alpha,
+        Constants::cubeSize, y, -Constants::cubeSize,                      gradientColor.r, gradientColor.g, gradientColor.b, alpha,
 
-        0, y + cubeSize, -cubeSize,                  color.r, color.g, color.b, alpha,
-        0, y + cubeSize, 0,                          color.r, color.g, color.b, alpha,
-        0 + cubeSize, y + cubeSize, 0,               color.r, color.g, color.b, alpha,
-        0 + cubeSize, y + cubeSize, -cubeSize,       color.r, color.g, color.b, alpha,
+        0, y + Constants::cubeSize, -Constants::cubeSize,                  color.r, color.g, color.b, alpha,
+        0, y + Constants::cubeSize, 0,                          color.r, color.g, color.b, alpha,
+        0 + Constants::cubeSize, y + Constants::cubeSize, 0,               color.r, color.g, color.b, alpha,
+        0 + Constants::cubeSize, y + Constants::cubeSize, -Constants::cubeSize,       color.r, color.g, color.b, alpha,
     };
     return vertices;
 }

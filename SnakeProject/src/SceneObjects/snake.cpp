@@ -81,16 +81,16 @@ void Snake::calculateNextDirection(int keyPressed) {
 }
 
 void Snake::move() {
-    if (glfwGetTime() - lastMoveTimestamp > snakeSpeed) {
+    if (glfwGetTime() - lastMoveTimestamp > Constants::snakeSpeed) {
         glm::ivec3 newHeadCellPos = positions[0] + directions[0];
-        if (newHeadCellPos.x > nColumns - 1) {
+        if (newHeadCellPos.x > Constants::nColumns - 1) {
             newHeadCellPos.x = 0;
         } else if (newHeadCellPos.x < 0) {
-            newHeadCellPos.x = nColumns - 1;
-        } else if (newHeadCellPos.z > nRows - 1) {
+            newHeadCellPos.x = Constants::nColumns - 1;
+        } else if (newHeadCellPos.z > Constants::nRows - 1) {
             newHeadCellPos.z = 0;
         } else if (newHeadCellPos.z < 0) {
-            newHeadCellPos.z = nRows - 1;
+            newHeadCellPos.z = Constants::nRows - 1;
         }
 
         for (int i = positions.size() - 1; i >= 0; i--) {
@@ -110,9 +110,9 @@ void Snake::move() {
 
     for (int i = 0; i < positions.size(); i++) {
         glm::vec3 offset = glm::vec3(
-            positions[i].x * cubeSize, 
+            positions[i].x * Constants::cubeSize, 
             0, 
-            -positions[i].z * cubeSize
+            -positions[i].z * Constants::cubeSize
         );
         
         shader.setVec2("posOffset", glm::vec2(offset.x, offset.z));

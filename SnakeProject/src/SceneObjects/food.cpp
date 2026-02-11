@@ -22,8 +22,8 @@ void Food::render(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
         if (cube != nullptr) delete cube;
         cube = new Cube(glm::vec3(255/255.0f, 209.0f/255.0f, 102.0f/255.0f));
 
-        foodCell = glm::vec2((int)(std::rand()%nColumns), (int)(rand()%nRows));
-        glm::vec2 offset = glm::vec2(foodCell.x, -foodCell.y) * cubeSize;
+        foodCell = glm::vec2((int)(std::rand()%Constants::nColumns), (int)(rand()%Constants::nRows));
+        glm::vec2 offset = glm::vec2(foodCell.x, -foodCell.y) * Constants::cubeSize;
         shader.setVec2("offset", offset);
         
         cube->bind(0);
